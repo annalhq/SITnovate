@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, AlertTriangle, Shield, Download } from "lucide-react";
 import crypto from "crypto";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface PredictionResponse {
   predicted_class: number;
@@ -52,13 +54,40 @@ export default function Home() {
 
   const handleDownloadReport = () => {
     if (!response) return;
-    const blob = new Blob([JSON.stringify(response, null, 2)], {
-      type: "application/json",
+    const doc = new jsPDF();
+
+    doc.text("Spam Detection Report", 14, 20);
+    autoTable(doc, {
+      startY: 30,
+      head: [["Metric", "Value"]],
+      body: [
+        [
+          "Predicted Class",
+          response.predicted_class === 1 ? "Spam" : "Not Spam",
+        ],
+        [
+          "Spam Probability",
+          `${(response.probabilities[1] * 100).toFixed(2)}%`,
+        ],
+        [
+          "Not Spam Probability",
+          `${(response.probabilities[0] * 100).toFixed(2)}%`,
+        ],
+        ["Blacklist Weight", response.blacklist_weight ?? "N/A"],
+        ["SHA-256 Hash", response.hash ?? "N/A"],
+      ],
     });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `spam_report_${Date.now()}.json`;
-    link.click();
+
+    if (response.link_anomalies && response.link_anomalies.length > 0) {
+      doc.text("Suspicious Links", 14, doc.lastAutoTable.finalY + 10);
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 20,
+        head: [["Suspicious Links"]],
+        body: response.link_anomalies.map((link) => [link]),
+      });
+    }
+
+    doc.save(`spam_report_${Date.now()}.pdf`);
   };
 
   return (
@@ -136,27 +165,12 @@ export default function Home() {
                 </li>
               ))}
             </ul>
-            {response.blacklist_weight !== undefined && (
-              <p className="mt-2 text-sm">
-                Blacklist Word Weight: {response.blacklist_weight}
-              </p>
-            )}
-            {response.link_anomalies && response.link_anomalies.length > 0 && (
-              <>
-                <p className="mt-2 font-semibold">Suspicious Links Detected:</p>
-                <ul className="list-disc pl-4 text-red-600">
-                  {response.link_anomalies.map((link, index) => (
-                    <li key={index}>{link}</li>
-                  ))}
-                </ul>
-              </>
-            )}
             <p className="mt-2 text-sm">SHA-256 Hash: {response.hash}</p>
             <Button
               onClick={handleDownloadReport}
               className="mt-4 flex items-center"
             >
-              <Download className="mr-2 h-4 w-4" /> Download Report
+              <Download className="mr-2 h-4 w-4" /> Download Report (PDF)
             </Button>
           </CardContent>
         </Card>
