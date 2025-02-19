@@ -1,21 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Loader2, Upload, AlertTriangle, Shield, Mail } from "lucide-react";
+import { Loader2, AlertTriangle, Shield } from "lucide-react";
 
 interface PredictionResponse {
   predicted_class: number;
@@ -62,10 +52,7 @@ export default function Home() {
         </p>
       </div>
 
-      <Tabs
-        defaultValue="single"
-        className="mb-8"
-      >
+      <Tabs defaultValue="single" className="mb-8">
         <TabsList>
           <TabsTrigger value="single">Single Analysis</TabsTrigger>
         </TabsList>
@@ -111,17 +98,23 @@ export default function Home() {
             <CardTitle>Analysis Result</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>
-              <strong>Predicted Class:</strong> {response.predicted_class}
+            <p className="flex items-center text-lg font-bold">
+              {response.predicted_class === 1 ? (
+                <>
+                  <AlertTriangle className="mr-2 text-red-600" /> Spam Detected
+                </>
+              ) : (
+                <>
+                  <Shield className="mr-2 text-green-600" /> Not a Spam
+                </>
+              )}
             </p>
-            <p>
-              <strong>Probabilities:</strong>
-            </p>
+            <p className="mt-2 font-semibold">Probabilities:</p>
             <ul className="list-disc pl-4">
               {response.probabilities.map((prob, index) => (
-                <li key={index}>
-                  Class {index}: {(prob * 100).toFixed(2)}%
-                </li>
+              <li key={index}>
+                {index === 1 ? "Spam Probability" : "Not a Spam Probability"}: {(prob * 100).toFixed(2)}%
+              </li>
               ))}
             </ul>
           </CardContent>
