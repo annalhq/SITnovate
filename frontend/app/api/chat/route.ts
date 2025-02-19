@@ -12,7 +12,7 @@ export async function POST(req: Request) {
           prompt: {
                system:
                     "You are an email spam classifier checker" +
-                    "Ouput the class of the email as spam or not spam",
+                    "Output the class of the email as spam or not spam",
 
                messages: asChatMessages(messages),
           },
