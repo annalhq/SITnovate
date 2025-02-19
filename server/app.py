@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import the CORS function
 import tensorflow as tf
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import numpy as np
@@ -6,6 +7,9 @@ import json
 import os
 
 app = Flask(__name__)
+
+# Enable CORS globally for all routes
+CORS(app)
 
 # Define file paths
 MODEL_WEIGHTS_PATH = "my_model.h5"
@@ -50,23 +54,4 @@ def predict():
         text = data.get("text", "").strip()
 
         if not text:
-            return jsonify({"error": "Empty text input"}), 400
-
-        predicted_class, probabilities = predict_spam(text, model, tokenizer)
-
-        response = {
-            "predicted_class": int(predicted_class),
-            "probabilities": probabilities.tolist()
-        }
-        return jsonify(response)
-
-    except Exception as e:
-        return jsonify({"error": "Prediction failed", "details": str(e)}), 500
-
-@app.route("/", methods=["GET"])
-def home():
-    return "Flask API is running!"
-
-# Run the Flask app
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+            return jsonify({"
