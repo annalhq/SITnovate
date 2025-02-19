@@ -10,7 +10,7 @@ import os
 app = Flask(__name__)
 
 # ✅ Allow CORS explicitly for Next.js (localhost:3000)
-CORS(app, resources={r"/predict": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/predict": {"origins": ["http://localhost:*", "https://*.railway.app", "https://*.vercel.app"]}})
 
 # Load Model & Tokenizer
 MODEL_WEIGHTS_PATH = "my_model.h5"
