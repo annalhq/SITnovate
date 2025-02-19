@@ -33,3 +33,5 @@ Thumbs.db
 *.swn
 *.sublime-project
 *.sublime-workspace
+
+*.h5
