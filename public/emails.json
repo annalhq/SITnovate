@@ -1,0 +1,49 @@
+{
+  "emails": [
+    {
+      "user_email": "user1@example.com",
+      "header": {
+        "from": "sender@example.com",
+        "subject": "Welcome to Our Service!",
+        "protocol": "SMTP",
+        "dmarc": {
+          "status": "pass",
+          "domain": "example.com",
+          "policy": "reject"
+        },
+        "metadata": {
+          "received": "2023-10-01T12:34:56Z",
+          "spf": "pass",
+          "dkim": "pass",
+          "message_id": "<123456789@example.com>"
+        }
+      },
+      "links": ["https://example.com/welcome", "https://example.com/faq"],
+      "text": "Dear User, welcome to our platform. We're excited to have you on board!"
+    },
+    {
+      "user_email": "user2@example.com",
+      "header": {
+        "from": "newsletter@example.com",
+        "subject": "Your Monthly Newsletter",
+        "protocol": "SMTP",
+        "dmarc": {
+          "status": "fail",
+          "domain": "example.com",
+          "policy": "quarantine"
+        },
+        "metadata": {
+          "received": "2023-10-02T09:12:34Z",
+          "spf": "fail",
+          "dkim": "pass",
+          "message_id": "<987654321@example.com>"
+        }
+      },
+      "links": [
+        "https://example.com/newsletter",
+        "https://example.com/unsubscribe"
+      ],
+      "text": "Here's your monthly update. Check out the latest news and updates."
+    }
+  ]
+}
