@@ -179,7 +179,7 @@ export default function Home() {
                 <Button
                 size="lg"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 md:px-8 py-5 md:py-6 text-base md:text-lg group w-full sm:w-auto"
-                onClick={() => window.location.href = "/detect"}
+                onClick={() => window.location.href = "/check"}
                 >
                 Start Scanning Now
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
