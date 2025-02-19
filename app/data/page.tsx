@@ -30,6 +30,7 @@ export default function Home() {
       <h2 className="text-xl font-semibold mt-4">Headers</h2>
       <pre className=" p-2 rounded">
         {JSON.stringify(data.headers, null, 2)}
+        console.log(data.headers);
       </pre>
 
       <h2 className="text-xl font-semibold mt-4">Links</h2>
