@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-
+from flask_cors import CORS  # Import CORS
 import tensorflow as tf
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import numpy as np
@@ -8,21 +8,19 @@ import os
 
 app = Flask(__name__)
 
+# ✅ Allow CORS explicitly for Next.js (localhost:3000)
+CORS(app, resources={r"/predict": {"origins": "http://localhost:3000"}})
 
-
-
-# Define file paths
+# Load Model & Tokenizer
 MODEL_WEIGHTS_PATH = "my_model.h5"
-TOKENIZER_PATH = "./"  # Use './tokenizer' if files are in a folder named 'tokenizer'
+TOKENIZER_PATH = "./"
 
-# Load the tokenizer correctly
 try:
     tokenizer = BertTokenizer.from_pretrained(TOKENIZER_PATH)
     print("Tokenizer loaded successfully.")
 except Exception as e:
     print(f"Error loading tokenizer: {e}")
 
-# Load the model architecture
 try:
     with open("my_model_architecture.json", "r") as json_file:
         model_config = json.load(json_file)
@@ -33,20 +31,6 @@ try:
 except Exception as e:
     print(f"Error loading model: {e}")
 
-# Function to predict spam
-def predict_spam(text, model, tokenizer):
-    if not text.strip():  # Handle empty text input
-        return 0, [1.0, 0.0]  # Default to class 0 with 100% probability
-
-    inputs = tokenizer(text, truncation=True, padding=True, return_tensors="tf")
-    outputs = model(inputs)
-    logits = outputs.logits
-    probabilities = tf.nn.softmax(logits, axis=-1).numpy()[0]
-    predicted_class = np.argmax(probabilities)
-
-    return predicted_class, probabilities
-
-# Define the prediction API route
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
@@ -56,21 +40,19 @@ def predict():
         if not text:
             return jsonify({"error": "Empty text input"}), 400
 
-        predicted_class, probabilities = predict_spam(text, model, tokenizer)
+        inputs = tokenizer(text, truncation=True, padding=True, return_tensors="tf")
+        outputs = model(inputs)
+        logits = outputs.logits
+        probabilities = tf.nn.softmax(logits, axis=-1).numpy()[0]
+        predicted_class = int(np.argmax(probabilities))
 
-        response = {
-            "predicted_class": int(predicted_class),
+        return jsonify({
+            "predicted_class": predicted_class,
             "probabilities": probabilities.tolist()
-        }
-        return jsonify(response)
+        })
 
     except Exception as e:
         return jsonify({"error": "Prediction failed", "details": str(e)}), 500
 
-@app.route("/", methods=["GET"])
-def home():
-    return "Flask API is running!"
-
-# Run the Flask app
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(debug=True, host="0.0.0.0", port=8080)
