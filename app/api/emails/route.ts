@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
-// Define TypeScript types
 interface EmailMetadata {
   received: string;
   spf: string;
@@ -35,15 +34,12 @@ interface EmailJson {
   emails: EmailData[];
 }
 
-// API Handler
 export async function GET() {
   try {
-    // Read the JSON file
     const filePath = path.join(process.cwd(), "public", "emails.json");
     const jsonData = await fs.readFile(filePath, "utf8");
     const data: EmailJson = JSON.parse(jsonData);
 
-    // Process Data
     const headers: Record<string, EmailHeader> = {};
     const links: Record<string, string[]> = {};
     const texts: Record<string, string> = {};
