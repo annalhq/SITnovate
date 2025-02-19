@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EmailData } from "@/types"; // Importing the EmailData type
+import { EmailData } from "@/types";
 
 export default function Home() {
   const [data, setData] = useState<EmailData | null>(null);
