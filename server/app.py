@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import the CORS function
+
 import tensorflow as tf
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import numpy as np
@@ -8,8 +8,8 @@ import os
 
 app = Flask(__name__)
 
-# Enable CORS globally for all routes
-CORS(app)
+
+
 
 # Define file paths
 MODEL_WEIGHTS_PATH = "my_model.h5"
@@ -26,7 +26,7 @@ except Exception as e:
 try:
     with open("my_model_architecture.json", "r") as json_file:
         model_config = json.load(json_file)
-    
+
     model = TFBertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
     model.load_weights(MODEL_WEIGHTS_PATH)
     print("Model loaded successfully.")
@@ -37,13 +37,13 @@ except Exception as e:
 def predict_spam(text, model, tokenizer):
     if not text.strip():  # Handle empty text input
         return 0, [1.0, 0.0]  # Default to class 0 with 100% probability
-    
+
     inputs = tokenizer(text, truncation=True, padding=True, return_tensors="tf")
     outputs = model(inputs)
     logits = outputs.logits
     probabilities = tf.nn.softmax(logits, axis=-1).numpy()[0]
     predicted_class = np.argmax(probabilities)
-    
+
     return predicted_class, probabilities
 
 # Define the prediction API route
@@ -54,4 +54,23 @@ def predict():
         text = data.get("text", "").strip()
 
         if not text:
-            return jsonify({"
+            return jsonify({"error": "Empty text input"}), 400
+
+        predicted_class, probabilities = predict_spam(text, model, tokenizer)
+
+        response = {
+            "predicted_class": int(predicted_class),
+            "probabilities": probabilities.tolist()
+        }
+        return jsonify(response)
+
+    except Exception as e:
+        return jsonify({"error": "Prediction failed", "details": str(e)}), 500
+
+@app.route("/", methods=["GET"])
+def home():
+    return "Flask API is running!"
+
+# Run the Flask app
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
