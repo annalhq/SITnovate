@@ -79,9 +79,10 @@ export default function Home() {
     });
 
     if (response.link_anomalies && response.link_anomalies.length > 0) {
-      doc.text("Suspicious Links", 14, doc.lastAutoTable.finalY + 10);
+      const finalY = (doc as any).autoTable.previous.finalY;
+      doc.text("Suspicious Links", 14, finalY + 10);
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 20,
+        startY: finalY + 20,
         head: [["Suspicious Links"]],
         body: response.link_anomalies.map((link) => [link]),
       });
