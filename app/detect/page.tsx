@@ -252,7 +252,7 @@ export default function DetectPage() {
                 >
                   {isAnalyzing ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-2 h-4gt w-4 animate-spin" />
                       Analyzing..
                     </>
                   ) : (
