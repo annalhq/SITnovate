@@ -176,13 +176,14 @@ export default function Home() {
               real-time.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 px-4">
-              <Button
+                <Button
                 size="lg"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 md:px-8 py-5 md:py-6 text-base md:text-lg group w-full sm:w-auto"
-              >
+                onClick={() => window.location.href = "/detect"}
+                >
                 Start Scanning Now
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
+                </Button>
             </div>
             {/* Trust badges - Mobile Responsive */}
             <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-border/50 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 px-4">
