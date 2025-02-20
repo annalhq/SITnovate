@@ -21,11 +21,22 @@
 **Problem statement**: Email spam classifier 
 **Problem Code**: AM01
 
+## Solution
+
+TruthSeek is an advanced email classifier that leverages a multi-stage architecture combining RoBERTa with CNN and a hierarchical attention network. This approach ensures high accuracy in distinguishing spam from legitimate emails.
+
+### Model Architecture
+1. **RoBERTa**: Utilized for initial text encoding.
+2. **CNN**: Applied for feature extraction from encoded text.
+3. **Hierarchical Attention Network**: Enhances the model's focus on important words and sentences.
+
+### Model Links
+- [RoBERTa Model on HuggingFace](https://huggingface.co/annalhq/truthseek)
+
 ## Team Members
 @annalhq @MasterBhuvnesh
 
 <img src="https://contrib.rocks/image?repo=annalhq/sitnovate"/>
-
 
 ## Analytics
 ![Alt](https://repobeats.axiom.co/api/embed/50dc57db333fa63a964001acda2ddf3ea4886946.svg "Repobeats analytics image")
