@@ -17,7 +17,42 @@ interface PredictionResponse {
   link_anomalies?: string[];
   hash?: string;
   error?: string;
+  protocols?: Record<string, string>;
 }
+
+const analyzeProtocols = (text: string) => {
+  const protocolStatus: Record<string, string> = {
+    SPF: "Unknown",
+    DKIM: "Unknown",
+    DMARC: "Unknown",
+    TLS: "Unknown",
+  };
+
+  if (/SPF: pass/i.test(text)) protocolStatus.SPF = "Safe";
+  else if (/SPF: fail|softfail|neutral/i.test(text))
+    protocolStatus.SPF = "Unsafe";
+
+  if (/DKIM: pass/i.test(text)) protocolStatus.DKIM = "Safe";
+  else if (/DKIM: fail|none/i.test(text)) protocolStatus.DKIM = "Unsafe";
+
+  if (/DMARC: reject|quarantine/i.test(text)) protocolStatus.DMARC = "Safe";
+  else if (/DMARC: none|fail/i.test(text)) protocolStatus.DMARC = "Unsafe";
+
+  if (/TLS: (required|enforced)/i.test(text)) protocolStatus.TLS = "Safe";
+  else if (/TLS: none|optional/i.test(text)) protocolStatus.TLS = "Unsafe";
+
+  return protocolStatus;
+};
+
+const overrideSpamDetection = (
+  originalPrediction: number,
+  protocols: Record<string, string>
+) => {
+  const safeCount = Object.values(protocols).filter(
+    (status) => status === "Safe"
+  ).length;
+  return safeCount >= 3 ? 0 : originalPrediction;
+};
 
 export default function Home() {
   const [inputText, setInputText] = useState("");
@@ -31,6 +66,7 @@ export default function Home() {
     setResponse(null);
 
     try {
+      const protocols = analyzeProtocols(inputText);
       const res = await fetch("http://127.0.0.1:8080/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,12 +74,15 @@ export default function Home() {
       });
 
       if (!res.ok) throw new Error("Failed to fetch");
-
       const data: PredictionResponse = await res.json();
       if (data.error) setError(data.error);
       else {
         data.hash = crypto.createHash("sha256").update(inputText).digest("hex");
-        setResponse(data);
+        data.predicted_class = overrideSpamDetection(
+          data.predicted_class,
+          protocols
+        );
+        setResponse({ ...data, protocols });
       }
     } catch (error) {
       setError("Error occurred while fetching data");
@@ -62,7 +101,7 @@ export default function Home() {
       head: [["Metric", "Value"]],
       body: [
         [
-          "Predicted Class",
+          "Final Classification",
           response.predicted_class === 1 ? "Spam" : "Not Spam",
         ],
         [
@@ -78,33 +117,27 @@ export default function Home() {
       ],
     });
 
-    if (response.link_anomalies && response.link_anomalies.length > 0) {
-      const finalY = (doc as any).autoTable.previous.finalY;
-      doc.text("Suspicious Links", 14, finalY + 10);
-      autoTable(doc, {
-        startY: finalY + 20,
-        head: [["Suspicious Links"]],
-        body: response.link_anomalies.map((link) => [link]),
-      });
-    }
+    const finalY = (doc as any).autoTable.previous.finalY;
+    doc.text("Security Protocols", 14, finalY + 10);
+    autoTable(doc, {
+      startY: finalY + 20,
+      head: [["Protocol", "Status"]],
+      body: Object.entries(response.protocols || {}).map(([key, value]) => [
+        key,
+        value,
+      ]),
+    });
 
     doc.save(`spam_report_${Date.now()}.pdf`);
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Email Spam Detection</h1>
-        <p className="text-muted-foreground">
-          Detect spam, phishing, and legitimate emails
-        </p>
-      </div>
-
-      <Tabs defaultValue="single" className="mb-8">
+      <h1 className="text-3xl font-bold mb-4">Email Spam Detection</h1>
+      <Tabs defaultValue="single">
         <TabsList>
           <TabsTrigger value="single">Single Analysis</TabsTrigger>
         </TabsList>
-
         <TabsContent value="single">
           <Card>
             <CardHeader>
@@ -132,15 +165,12 @@ export default function Home() {
           </Card>
         </TabsContent>
       </Tabs>
-
       {error && (
         <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
-          <h2 className="font-bold">Error:</h2>
-          <p>{error}</p>
+          Error: {error}
         </div>
       )}
-
-      {response && !error && (
+      {response && (
         <Card className="mt-4">
           <CardHeader>
             <CardTitle>Analysis Result</CardTitle>
@@ -150,23 +180,28 @@ export default function Home() {
               {response.predicted_class === 1 ? (
                 <>
                   <AlertTriangle className="mr-2 text-red-600" /> Spam Detected
+                  ({(response.probabilities[1] * 100).toFixed(2)}%)
                 </>
               ) : (
                 <>
-                  <Shield className="mr-2 text-green-600" /> Not a Spam
+                  <Shield className="mr-2 text-green-600" /> Not a Spam (
+                  {(response.probabilities[0] * 100).toFixed(2)}%)
                 </>
               )}
             </p>
-            <p className="mt-2 font-semibold">Probabilities:</p>
+            <h3 className="font-bold mt-4">Security Protocols:</h3>
             <ul className="list-disc pl-4">
-              {response.probabilities.map((prob, index) => (
-                <li key={index}>
-                  {index === 1 ? "Spam Probability" : "Not a Spam Probability"}:{" "}
-                  {(prob * 100).toFixed(2)}%
+              {Object.entries(response.protocols || {}).map(([key, value]) => (
+                <li
+                  key={key}
+                  className={
+                    value === "Safe" ? "text-green-600" : "text-red-600"
+                  }
+                >
+                  {key}: {value}
                 </li>
               ))}
             </ul>
-            <p className="mt-2 text-sm">SHA-256 Hash: {response.hash}</p>
             <Button
               onClick={handleDownloadReport}
               className="mt-4 flex items-center"
