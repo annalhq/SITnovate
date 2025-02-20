@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Spam Checker</h2>
+        
+        <div class="space-y-4">
+            <textarea 
+                id="textInput" 
+                class="w-full h-32 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                placeholder="Enter text to check..."></textarea>
+            
+            <button 
+                onclick="checkSpam()" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                Check Text
+            </button>
+
+            <p id="result" class="text-center text-lg font-medium"></p>
+        </div>
+    </div>
+
+    <script>
+        async function checkSpam() {
+            const text = document.getElementById("textInput").value;
+            const resultElement = document.getElementById("result");
+            const button = document.querySelector('button');
+            
+            if (!text.trim()) return;
+
+            // Update UI for loading state
+            button.disabled = true;
+            button.classList.add('opacity-50', 'cursor-not-allowed');
+            resultElement.textContent = "Checking...";
+            resultElement.className = "text-center text-lg font-medium text-gray-600";
+
+            try {
+                const response = await fetch("http://127.0.0.1:8080/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+                
+                const data = await response.json();
+                const isSpam = data.prediction;
+                
+                resultElement.textContent = isSpam ? "Spam Detected!" : "Not Spam";
+                resultElement.className = `text-center text-lg font-medium ${isSpam ? 'text-red-600' : 'text-green-600'}`;
+            } catch (error) {
+                resultElement.textContent = "Error checking text";
+                resultElement.className = "text-center text-lg font-medium text-red-600";
+            } finally {
+                button.disabled = false;
+                button.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+    </script>
+</body>
+</html>
