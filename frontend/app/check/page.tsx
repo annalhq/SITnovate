@@ -35,8 +35,8 @@ const analyzeProtocols = (text: string) => {
   if (/DKIM: pass/i.test(text)) protocolStatus.DKIM = "Safe";
   else if (/DKIM: fail|none/i.test(text)) protocolStatus.DKIM = "Unsafe";
 
-  if (/DMARC: reject|quarantine/i.test(text)) protocolStatus.DMARC = "Safe";
-  else if (/DMARC: none|fail/i.test(text)) protocolStatus.DMARC = "Unsafe";
+  if (/DMARC: reject|quarantine/i.test(text)) protocolStatus.DMAR = "Safe";
+  else if (/DMARC: none|fail/i.test(text)) protocolStatus.DMAR = "Unsafe";
 
   if (/TLS: (required|enforced)/i.test(text)) protocolStatus.TLS = "Safe";
   else if (/TLS: none|optional/i.test(text)) protocolStatus.TLS = "Unsafe";
