@@ -151,7 +151,7 @@ export default function Home() {
         <div className="flex items-center justify-center mb-8">
           <Mail className="h-8 w-8 text-indigo-600 mr-3" />
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500">
-            Email Shield
+            TruthSeek
           </h1>
         </div>
 

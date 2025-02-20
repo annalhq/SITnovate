@@ -23,9 +23,9 @@ import {
 import { useState } from "react";
 
 const stats = [
-  { value: "99.9%", label: "Detection Accuracy" },
+  { value: "97%", label: "Detection Accuracy" },
   { value: "24/7", label: "Monitoring" },
-  { value: "1M+", label: "Emails Protected" },
+  { value: "125M", label: "Parameters" },
 ];
 
 const features = [
