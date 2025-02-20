@@ -1,65 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spam Checker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            min-width: 400px;
+            min-height: 300px;
+            max-width: 400px;
+            margin: 0 auto;
+            background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+            padding: 16px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            width: calc(100% - 48px);
+            margin: 0 auto;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .space-y-4>* {
+            margin-bottom: 16px;
+        }
+
+        .textarea {
+            width: calc(100% - 24px);
+            height: 112px;
+            padding: 8px 12px;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+        }
+
+        .textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+
+        .button {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 500;
+            min-height: 1.5em;
+        }
+
+        .text-gray-600 {
+            color: #4b5563;
+        }
+
+        .text-red-600 {
+            color: #dc2626;
+        }
+
+        .text-green-600 {
+            color: #16a34a;
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Spam Checker</h2>
-        
+
+<body>
+    <div class="container">
+        <h2 class="title">Spam Checker</h2>
+
         <div class="space-y-4">
-            <textarea 
-                id="textInput" 
-                class="w-full h-32 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                placeholder="Enter text to check..."></textarea>
-            
-            <button 
-                onclick="checkSpam()" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+            <textarea id="textInput" class="textarea" placeholder="Enter text to check..."></textarea>
+
+            <button id="checkButton" class="button">
                 Check Text
             </button>
 
-            <p id="result" class="text-center text-lg font-medium"></p>
+            <p id="result" class="result"></p>
         </div>
     </div>
 
-    <script>
-        async function checkSpam() {
-            const text = document.getElementById("textInput").value;
-            const resultElement = document.getElementById("result");
-            const button = document.querySelector('button');
-            
-            if (!text.trim()) return;
-
-            // Update UI for loading state
-            button.disabled = true;
-            button.classList.add('opacity-50', 'cursor-not-allowed');
-            resultElement.textContent = "Checking...";
-            resultElement.className = "text-center text-lg font-medium text-gray-600";
-
-            try {
-                const response = await fetch("http://127.0.0.1:8080/predict", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text })
-                });
-                
-                const data = await response.json();
-                const isSpam = data.prediction;
-                
-                resultElement.textContent = isSpam ? "Spam Detected!" : "Not Spam";
-                resultElement.className = `text-center text-lg font-medium ${isSpam ? 'text-red-600' : 'text-green-600'}`;
-            } catch (error) {
-                resultElement.textContent = "Error checking text";
-                resultElement.className = "text-center text-lg font-medium text-red-600";
-            } finally {
-                button.disabled = false;
-                button.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>
