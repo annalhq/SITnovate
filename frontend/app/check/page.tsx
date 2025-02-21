@@ -58,16 +58,6 @@ const analyzeProtocols = (text: string) => {
   return protocolStatus;
 };
 
-const overrideSpamDetection = (
-  originalPrediction: number,
-  protocols: Record<string, string>
-) => {
-  const safeCount = Object.values(protocols).filter(
-    (status) => status === "Safe"
-  ).length;
-  return safeCount >= 3 ? 0 : originalPrediction;
-};
-
 export default function Home() {
   const [inputText, setInputText] = useState("");
   const [response, setResponse] = useState<PredictionResponse | null>(null);
@@ -92,10 +82,6 @@ export default function Home() {
       if (data.error) setError(data.error);
       else {
         data.hash = crypto.createHash("sha256").update(inputText).digest("hex");
-        data.predicted_class = overrideSpamDetection(
-          data.predicted_class,
-          protocols
-        );
         setResponse({ ...data, protocols });
       }
     } catch (error) {

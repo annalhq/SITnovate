@@ -1,6 +1,4 @@
-<h3 align="center"> SITnovate, Team DeepSick </h3>
-
-<h4 align="center"> ✨TruthSeek, an email classifier</h4>
+<h3 align="center"> ✨TruthSeek, an email classifier</h3>
 
 <div align="center">
   <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" />
@@ -16,10 +14,6 @@
 - [Solution](#solution)
 - [Analytics](#analytics)
 
-## Problem details
-
-**Problem statement**: Email spam classifier 
-**Problem Code**: AM01
 
 ## Solution
 
@@ -33,9 +27,7 @@ TruthSeek is an advanced email classifier that leverages a multi-stage architect
 ### Model Links
 - [RoBERTa Model on HuggingFace](https://huggingface.co/annalhq/truthseek)
 
-## Team Members
-@annalhq @MasterBhuvnesh
-
+## Contributors
 <img src="https://contrib.rocks/image?repo=annalhq/sitnovate"/>
 
 ## Analytics
