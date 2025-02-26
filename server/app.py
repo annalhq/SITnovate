@@ -1,6 +1,6 @@
 
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # Import CORS
+from flask_cors import CORS
 import tensorflow as tf
 from transformers import BertTokenizer, TFBertForSequenceClassification
 import numpy as np
@@ -9,10 +9,8 @@ import os
 
 app = Flask(__name__)
 
-# ✅ Allow CORS explicitly for Next.js (localhost:3000)
 CORS(app, resources={r"/predict": {"origins": ["*","http://localhost:*", "https://*.railway.app", "https://*.vercel.app"]}})
 
-# Load Model & Tokenizer
 MODEL_WEIGHTS_PATH = "my_model.h5"
 TOKENIZER_PATH = "./"
 

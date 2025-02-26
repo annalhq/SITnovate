@@ -14,7 +14,6 @@ async function checkSpam() {
     return;
   }
 
-  // Update UI for loading state
   button.disabled = true;
   resultElement.textContent = "Checking...";
   resultElement.className = "result text-gray-600";
@@ -32,8 +31,7 @@ async function checkSpam() {
 
     const data = await response.json();
 
-    // Ensure compatibility with your React structure
-    const isSpam = data.predicted_class === 1; // Check against `predicted_class`
+    const isSpam = data.predicted_class === 1; // 1 is spam, 0 is not spam
     const spamProbability = data.probabilities
       ? data.probabilities[1] * 100
       : 0;

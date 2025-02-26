@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (!text.trim()) return;
 
-        // Update UI for loading state
         button.disabled = true;
         button.classList.add('opacity-50', 'cursor-not-allowed');
         resultElement.textContent = "Checking...";
@@ -35,6 +34,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Add click event listener to the button
     document.querySelector('button').addEventListener('click', checkSpam);
 });
